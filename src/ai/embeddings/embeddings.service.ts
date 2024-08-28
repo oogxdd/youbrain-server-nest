@@ -13,7 +13,14 @@ export class EmbeddingsService {
     return this.openaiService.generateEmbeddings(text);
   }
 
+  // TSTODO
+  async upsertEmbeddings(records: any) {
+    const index = 'video-transcripts';
+    await this.pineconeService.upsertRecords(records, index);
+  }
+
   async queryEmbeddings(embedding: number[]): Promise<any[]> {
-    return this.pineconeService.queryIndex(embedding, 'video-transcripts');
+    const index = 'video-transcripts';
+    return this.pineconeService.queryIndex(embedding, index);
   }
 }

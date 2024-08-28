@@ -12,6 +12,12 @@ export class PineconeService {
     });
   }
 
+  // TSTODO
+  async upsertRecords(records: any[], indexName: string) {
+    const index = this.pinecone.index(indexName);
+    await index.upsert(records);
+  }
+
   async queryIndex(embedding: number[], indexName: string): Promise<any[]> {
     const index = this.pinecone.index(indexName);
     const queryResponse = await index.query({

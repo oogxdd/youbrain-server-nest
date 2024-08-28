@@ -7,7 +7,6 @@ async function bootstrap() {
   app.enableCors({
     allowedHeaders: '*',
     origin: '*',
-    // credentials: true,
   });
 
   await app.listen(5050);

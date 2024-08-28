@@ -1,3 +1,6 @@
+export * from './extractParagraphsFromTranscript';
+export * from './mergeSameSpeakerUtterances';
+
 export function formatTimestamp(seconds: number): string {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
