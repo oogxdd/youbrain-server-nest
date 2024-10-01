@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ClaudeService } from '@/integrations/claude/claude.service';
 
 @Injectable()
@@ -10,7 +9,7 @@ export class LLMService {
     return this.claudeService.generateMessage(prompt);
   }
 
-  streamResponse(prompt: string, eventEmitter: EventEmitter2): void {
-    this.claudeService.generateMessageStream(prompt, eventEmitter);
+  async *generateStreamingResponse(prompt: string): AsyncGenerator<string> {
+    yield* this.claudeService.generateStreamingMessage(prompt);
   }
 }

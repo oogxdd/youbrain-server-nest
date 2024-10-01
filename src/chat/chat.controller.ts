@@ -17,15 +17,4 @@ export class ChatController {
     const response = await this.chatService.processQuestion(body.question);
     return { response };
   }
-
-  @Sse('stream')
-  streamChat(): Observable<{ data: string }> {
-    return this.chatService.getStreamMessages().pipe(
-      map((message: string) => {
-        console.log(message);
-
-        return { data: message };
-      }),
-    );
-  }
 }
