@@ -18,8 +18,8 @@ export class ClaudeService {
       // max_tokens: 1024 * 0.5,
 
       model: 'claude-3-5-sonnet-20240620',
-      max_tokens: 1024 * 0.5,
-      // max_tokens: 1024 * 8,
+      // max_tokens: 1024 * 0.5,
+      max_tokens: 1024 * 8,
       messages: [{ role: 'user', content: prompt }],
     });
 
@@ -32,8 +32,8 @@ export class ClaudeService {
       // max_tokens: 1024 * 0.5,
 
       model: 'claude-3-5-sonnet-20240620',
-      max_tokens: 1024 * 0.5,
-      // max_tokens: 1024 * 8,
+      // max_tokens: 1024 * 0.5,
+      max_tokens: 1024 * 8,
       messages: [{ role: 'user', content: prompt }],
       stream: true,
     });
