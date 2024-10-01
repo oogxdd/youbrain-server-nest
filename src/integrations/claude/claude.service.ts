@@ -14,42 +14,35 @@ export class ClaudeService {
 
   async generateMessage(prompt: string): Promise<string> {
     const response = await this.anthropic.messages.create({
-      model: 'claude-3-haiku-20240307',
+      // model: 'claude-3-haiku-20240307',
+      // max_tokens: 1024 * 0.5,
+
+      model: 'claude-3-5-sonnet-20240620',
       max_tokens: 1024 * 0.5,
+      // max_tokens: 1024 * 8,
       messages: [{ role: 'user', content: prompt }],
     });
 
     return this.extractTextContent(response.content);
   }
 
-  // async generateMessage(prompt: string): Promise<string> {
-  //   const response = await this.anthropic.messages.create({
-  //     // model: 'claude-3-5-sonnet-20240620',
-  //     // max_tokens: 1024 * 8,
-  //     model: 'claude-3-haiku-20240307',
-  //     max_tokens: 1024 * 0.5,
-  //     messages: [{ role: 'user', content: prompt }],
-  //   });
-  //   // Extract text from the response content
-  //   const textContent = response.content
-  //     .filter((block) => block.type === 'text')
-  //     .map((block) => (block.type === 'text' ? block.text : ''))
-  //     .join('\n');
-
-  //   return textContent;
-  // }
-
   async *generateStreamingMessage(prompt: string): AsyncGenerator<string> {
     const stream = await this.anthropic.messages.create({
-      model: 'claude-3-haiku-20240307',
+      // model: 'claude-3-haiku-20240307',
+      // max_tokens: 1024 * 0.5,
+
+      model: 'claude-3-5-sonnet-20240620',
       max_tokens: 1024 * 0.5,
+      // max_tokens: 1024 * 8,
       messages: [{ role: 'user', content: prompt }],
       stream: true,
     });
 
     for await (const chunk of stream) {
-      if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text') {
-        console.log(chunk);
+      if (
+        chunk.type === 'content_block_delta' &&
+        chunk.delta.type === 'text_delta'
+      ) {
         yield chunk.delta.text;
       }
     }

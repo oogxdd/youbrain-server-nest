@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { EventEmitter2 } from '@nestjs/event-emitter';
+import { Response } from 'express';
 import { EmbeddingsService } from '@/ai/embeddings/embeddings.service';
 import { LLMService } from '@/ai/llm/llm.service';
 
@@ -8,25 +8,39 @@ export class ChatService {
   constructor(
     private embeddingsService: EmbeddingsService,
     private llmService: LLMService,
-    private eventEmitter: EventEmitter2,
   ) {}
 
-  async processQuestion(
-    question: string,
-    stream: boolean = false,
-  ): Promise<any> {
+  async processQuestion(question: string, res: Response) {
     try {
       const embedding =
         await this.embeddingsService.generateEmbeddings(question);
       const queryResponse =
         await this.embeddingsService.queryEmbeddings(embedding);
+
+      this.sendSSEMessage(res, { type: 'queryResponse', data: queryResponse });
+
       const prompt = this.buildPrompt(question, queryResponse);
-      const llmResponse = await this.llmService.generateResponse(prompt);
-      return { response: llmResponse, queryResponse };
+
+      for await (const chunk of this.llmService.generateStreamingResponse(
+        prompt,
+      )) {
+        this.sendSSEMessage(res, { type: 'llmResponse', data: chunk });
+      }
+
+      res.write('event: complete\ndata: Stream completed\n\n');
     } catch (error) {
-      console.error('Error processing chat request:', error);
-      throw new Error('An error occurred while processing your request.');
+      console.error('Error in processQuestion:', error);
+      this.sendSSEMessage(res, {
+        type: 'error',
+        data: 'An error occurred while processing your request.',
+      });
+    } finally {
+      res.end();
     }
+  }
+
+  private sendSSEMessage(res: Response, message: { type: string; data: any }) {
+    res.write(`event: message\ndata: ${JSON.stringify(message)}\n\n`);
   }
 
   private buildPrompt(question: string, queryResponse: any[]): string {
