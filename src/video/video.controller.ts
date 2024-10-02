@@ -2,55 +2,33 @@ import {
   Controller,
   Post,
   Body,
-  Get,
-  UseInterceptors,
-  // UploadedFile,
-  // UploadedFiles,
-  // ParseFilePipe,
-  // MaxFileSizeValidator,
-  // FileTypeValidator,
-  HttpStatus,
-  HttpException,
   Param,
+  UseInterceptors,
+  UploadedFile,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
-// import { FileInterceptor } from '@nestjs/platform-express';
-import { VideoService } from '@/video/video.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { VideoService } from './video.service';
+import { CreateVideoDto } from './dtos/create-video.dto';
 
 @Controller('video')
 export class VideoController {
   constructor(private readonly videoService: VideoService) {}
 
-  // @Post('upload')
-  // @UseInterceptors(FileInterceptor('file'))
-  // async uploadVideo(
-  //   @UploadedFile(
-  //     new ParseFilePipe({
-  //       validators: [
-  //         new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 100 }), // 100MB
-  //         new FileTypeValidator({ fileType: 'video/*' }),
-  //       ],
-  //     }),
-  //   )
-  //   file: Express.Multer.File,
-  // ) {
-  //   return this.videoService.uploadAndProcessVideo(file);
-  // }
-
-  // @Post('upload-multiple')
-  // @UseInterceptors(FileInterceptor('files'))
-  // async uploadMultipleVideos(
-  //   @UploadedFiles(
-  //     new ParseFilePipe({
-  //       validators: [
-  //         new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 100 }), // 100MB
-  //         new FileTypeValidator({ fileType: 'video/*' }),
-  //       ],
-  //     }),
-  //   )
-  //   files: Array<Express.Multer.File>,
-  // ) {
-  //   return this.videoService.uploadAndProcessVideos(files);
-  // }
+  @Post('process-youtube')
+  async processYoutubeVideo(@Body('youtubeId') youtubeId: string) {
+    try {
+      const result = await this.videoService.processYoutubeVideo(youtubeId);
+      return result;
+    } catch (error) {
+      console.error('Error in processYoutubeVideo:', error);
+      throw new HttpException(
+        'Failed to process YouTube video',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 
   @Post('callback/:videoId')
   async handleTranscriptionCallback(
@@ -69,8 +47,12 @@ export class VideoController {
     }
   }
 
-  // @Post('process')
-  // async processVideo(@Body('videoUrl') videoUrl: string) {
-  //   return this.videoService.processVideo(videoUrl);
+  // @Post('upload')
+  // @UseInterceptors(FileInterceptor('file'))
+  // async uploadVideo(
+  //   @UploadedFile() file: Express.Multer.File,
+  //   @Body() createVideoDto: CreateVideoDto,
+  // ) {
+  //   return this.videoService.uploadAndProcessVideo(file, createVideoDto);
   // }
 }
