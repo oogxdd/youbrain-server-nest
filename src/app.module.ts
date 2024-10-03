@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { MulterModule } from '@nestjs/platform-express';
 
@@ -17,13 +18,22 @@ import { DeepgramModule } from '@/integrations/deepgram/deepgram.module';
 import { HasuraModule } from '@/integrations/hasura/hasura.module';
 import { DigitalOceanModule } from '@/integrations/digitalocean/digitalocean.module';
 
-import config from './config';
+import config from './@config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       load: [config],
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        ...configService.get('database'),
+        autoLoadEntities: true,
+        synchronize: true,
+      }),
+      inject: [ConfigService],
     }),
     MulterModule.register({
       dest: './uploads',
