@@ -3,7 +3,7 @@ import { EmbeddingsService } from '@/ai/embeddings/embeddings.service';
 import {
   extractParagraphsFromTranscript,
   mergeSameSpeakerUtterances,
-} from '@/utils';
+} from '@/@utils';
 
 @Injectable()
 export class TranscriptionService {
