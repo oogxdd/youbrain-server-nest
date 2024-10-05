@@ -10,13 +10,16 @@ export class ChatService {
     private llmService: LLMService,
   ) {}
 
-  async processQuestion(question: string, res: Response) {
+  async processQuestion(question: string, res: Response, userId: string) {
     try {
       const embedding =
         await this.embeddingsService.generateEmbeddings(question);
-      const queryResponse =
-        await this.embeddingsService.queryEmbeddings(embedding);
+      const queryResponse = await this.embeddingsService.queryEmbeddings(
+        embedding,
+        userId,
+      );
 
+      console.log(queryResponse);
       this.sendSSEMessage(res, { type: 'queryResponse', data: queryResponse });
 
       const prompt = this.buildPrompt(question, queryResponse);
@@ -45,10 +48,13 @@ export class ChatService {
 
   private buildPrompt(question: string, queryResponse: any[]): string {
     const context = queryResponse.map((match, index) => ({
-      text: match.metadata.paragraphText,
-      videoTitle: match.metadata.videoTitle,
-      youtubeId: match.metadata.youtubeId,
-      timestamp: match.metadata.paragraphStart,
+      text: match.metadata.content,
+      source: match.metadata.reference,
+      bookmarkId: match.metadata.bookmarkdId,
+      // text: match.metadata.paragraphText,
+      // videoTitle: match.metadata.videoTitle,
+      // youtubeId: match.metadata.youtubeId,
+      // timestamp: match.metadata.paragraphStart,
       index: index,
     }));
 
@@ -59,8 +65,7 @@ I have found the following relevant information from the user's knowledge base:
 ${context
   .map(
     (c) => `
-[${c.index}] Source: "${c.videoTitle}" (ID: ${c.youtubeId})
-Timestamp: ${c.timestamp}
+[${c.index}] Source: "${c.source}" (ID: ${c.bookmarkId})
 Content: "${c.text}"
 `,
   )
@@ -74,6 +79,7 @@ Please provide a response that:
 5. If multiple sources provide similar information, choose the most relevant or detailed one for citation.
 6. If the context doesn't contain enough relevant information to fully answer the question, provide the best possible answer with the available information without mentioning any limitations or suggesting additional information that might be needed.
 7. Does not include any disclaimers about the completeness of the information or suggest that additional information would be beneficial.
+8. Within the same paragraph, if referring to the same exact reference multiple times, only cite it once at the first mention.
 
 Format your response in a clear, structured manner. Do not include a separate references section, as the citations will be inline.
 

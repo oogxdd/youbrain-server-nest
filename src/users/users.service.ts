@@ -3,9 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { User } from './user.entity';
-import { CreateUserDto } from './dto/create-user.dto';
-import { SignInDto } from './dto/sign-in.dto';
+import { User } from './entities/user.entity';
+import { CreateUserDto } from './dtos/create-user.dto';
+import { SignInDto } from './dtos/sign-in.dto';
 
 @Injectable()
 export class UsersService {
@@ -22,7 +22,12 @@ export class UsersService {
       password: hashedPassword,
     });
     await this.usersRepository.save(user);
-    return { message: 'User created successfully', userId: user.userId };
+    const payload = { username: user.username, sub: user.userId };
+    return {
+      access_token: this.jwtService.sign(payload),
+      username: user.username,
+      userId: user.userId,
+    };
   }
 
   async signin(signInDto: SignInDto) {
@@ -42,6 +47,8 @@ export class UsersService {
     const payload = { username: user.username, sub: user.userId };
     return {
       access_token: this.jwtService.sign(payload),
+      username: user.username,
+      userId: user.userId,
     };
   }
 

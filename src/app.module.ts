@@ -1,11 +1,13 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { MulterModule } from '@nestjs/platform-express';
 
-import { ChatModule } from '@/chat/chat.module';
+import { UsersModule } from '@/users/users.module';
+import { BookmarksModule } from '@/bookmarks/bookmarks.module';
 import { VideoModule } from '@/video/video.module';
+import { ChatModule } from '@/chat/chat.module';
 
 import { LLMModule } from '@/ai/llm/llm.module';
 import { EmbeddingsModule } from '@/ai/embeddings/embeddings.module';
@@ -40,6 +42,8 @@ import config from './@config';
     }),
     EventEmitterModule.forRoot(),
 
+    UsersModule,
+    BookmarksModule,
     VideoModule,
     ChatModule,
 

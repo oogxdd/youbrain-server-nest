@@ -7,8 +7,8 @@ import {
   Request,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { SignInDto } from './dto/sign-in.dto';
+import { CreateUserDto } from './dtos/create-user.dto';
+import { SignInDto } from './dtos/sign-in.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Controller('users')
